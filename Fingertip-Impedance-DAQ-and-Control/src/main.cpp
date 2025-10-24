@@ -3,20 +3,24 @@
 #include <Arduino.h>
 #include <FlexCAN_T4.h>
 
+#define NUM_SERVO_COMMANDS 120 * 1000
+
 /*////////
  * Instantiate objects
  *////////
 QuadEncoder       encoder1(3, 5, 7);  // ENC1 using pins 0 (A) and 1 (B)
 Adafruit_NAU7802  nau;
-FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> can3;
+FlexCAN_T4        <CAN3, RX_SIZE_256, TX_SIZE_16> can3;
 
 IntervalTimer     encoderTimer;
 IntervalTimer     loadcellTimer;
+IntervalTimer     servoTimer;
 
 /*////////
  * Global Variables
  *////////
- uint16_t excitation_signal[120 * 1000];
+ uint16_t excitation_signal[NUM_SERVO_COMMANDS];
+ unsigned int servo_commnd_index = 0;
 
 
 /*////////
@@ -24,6 +28,7 @@ IntervalTimer     loadcellTimer;
  *////////
 void readEncoder();
 void readLoadCell();
+void commandServo();
 
 
 /*////////
@@ -96,6 +101,7 @@ void setup() {
    *////////
   encoderTimer.begin(readEncoder, 3125);  // 320 Hz timer
   loadcellTimer.begin(readLoadCell, 3125);  // Read load cell at 320 Hz
+  servoTimer.begin(commandServo, 1000); // Send position commands at 1kHz
 
 }
 
@@ -104,7 +110,11 @@ void setup() {
  * Main Loop
  *////////
 void loop() {
-  // put your main code here, to run repeatedly:
+  // Restart the teensy when the sine sweep is over
+  if(servo_commnd_index < NUM_SERVO_COMMANDS){
+    delay(5000);
+    SCB_AIRCR = 0x05FA0004; // Software reset of the teensy
+  }
 }
 
 /*////////
@@ -125,6 +135,22 @@ void readLoadCell(){
   Serial.println(micros());
 }
 
-void commandLoadCell(){
-  
+void commandServo(){
+  if (servo_commnd_index < NUM_SERVO_COMMANDS){
+
+    CAN_message_t tx;
+    tx.id = 0x3;
+    tx.len = 2;
+
+    // Fromat the message
+    tx.buf[0] = excitation_signal[servo_commnd_index] & 0xFF;        // Low byte
+    tx.buf[1] = (excitation_signal[servo_commnd_index] >> 8) & 0xFF; // High byte
+
+    // Transmit the CAN command
+    can3.write(tx);
+
+    // Increment the command index
+    servo_commnd_index++
+  }
+
 }
