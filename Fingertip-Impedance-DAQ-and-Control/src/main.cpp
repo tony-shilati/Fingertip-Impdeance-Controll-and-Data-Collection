@@ -106,7 +106,7 @@ void loop() {
  *////////
 
 void readEncoder(){
-  Serial.print("Encoder: ");
+  Serial.print("E: ");
   Serial.print(encoder1.read());
   Serial.print(", ");
   Serial.println(micros());
