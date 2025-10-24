@@ -21,6 +21,7 @@ IntervalTimer     servoTimer;
  *////////
  uint16_t excitation_signal[NUM_SERVO_COMMANDS];
  unsigned int servo_commnd_index = 0;
+ unsigned long start_micros;
 
 
 /*////////
@@ -96,6 +97,9 @@ void setup() {
   digitalWrite(12, LOW);
 
 
+  // Start the microsecond timer
+  start_micros = micros();
+
   /*////////
    * Start the control and DAQ timers
    *////////
@@ -122,17 +126,21 @@ void loop() {
  *////////
 
 void readEncoder(){
-  Serial.print("Encoder: ");
-  Serial.print(encoder1.read());
-  Serial.print(", ");
-  Serial.println(micros());
+  if (servo_commnd_index < NUM_SERVO_COMMANDS){
+    Serial.print("Encoder: ");
+    Serial.print(encoder1.read());
+    Serial.print(", ");
+    Serial.println(micros() - start_micros);
+  }
 }
 
 void readLoadCell(){
-  Serial.print("LC: ");
-  Serial.print(nau.read());
-  Serial.print(", ");
-  Serial.println(micros());
+  if (servo_commnd_index < NUM_SERVO_COMMANDS){
+    Serial.print("LC: ");
+    Serial.print(nau.read());
+    Serial.print(", ");
+    Serial.println(micros()-start_micros);
+  }
 }
 
 void commandServo(){
