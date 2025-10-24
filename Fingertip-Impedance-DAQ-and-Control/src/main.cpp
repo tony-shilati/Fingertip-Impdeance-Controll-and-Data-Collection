@@ -1,18 +1,22 @@
 #include <QuadEncoder.h>
 #include <Adafruit_NAU7802.h>
 #include <Arduino.h>
+#include <FlexCAN_T4.h>
 
 /*////////
  * Instantiate objects
  *////////
 QuadEncoder       encoder1(3, 5, 7);  // ENC1 using pins 0 (A) and 1 (B)
 Adafruit_NAU7802  nau;
+FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> can3;
+
 IntervalTimer     encoderTimer;
 IntervalTimer     loadcellTimer;
 
 /*////////
  * Global Variables
  *////////
+ uint16_t excitation_signal[120 * 1000];
 
 
 /*////////
@@ -34,6 +38,8 @@ void setup() {
   /*////////
    * Config the linear servo comms
    *////////
+  can3.begin();
+  can3.setBaudRate(1000000); // 1 Mbps
 
   /*////////
    * Config the load cell amp
@@ -117,4 +123,8 @@ void readLoadCell(){
   Serial.print(nau.read());
   Serial.print(", ");
   Serial.println(micros());
+}
+
+void commandLoadCell(){
+  
 }
