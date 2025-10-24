@@ -25,7 +25,16 @@ void setup() {
   Serial.begin(115200);
 
   /*
-   * Configure the encoder pins
+   * Config the linear servo comms
+   */
+
+  /*
+   * Config the load cell amp
+   */
+
+
+  /*
+   * Configure the encoder
    */
   encoder1.setInitConfig();   // load default settings
   encoder1.init();            // initialize hardware encoder
