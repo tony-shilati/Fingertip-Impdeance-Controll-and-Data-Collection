@@ -2,38 +2,38 @@
 #include <Adafruit_NAU7802.h>
 #include <Arduino.h>
 
-/*
+/*////////
  * Instantiate objects
- */ 
+ *////////
 QuadEncoder       encoder1(3, 5, 7);  // ENC1 using pins 0 (A) and 1 (B)
 Adafruit_NAU7802  nau;
 IntervalTimer     encoderTimer;
 IntervalTimer     loadcellTimer;
 
-/*
+/*////////
  * Global Variables
- */
+ *////////
 
 
-/*
+/*////////
  * Function Prototypes
- */
+ *////////
 void readEncoder();
 void readLoadCell();
 
 
-/*
+/*////////
  * Setup Code
- */
+ *////////
 void setup() {
   // Open a serial monitor
   Serial.begin(115200);
   while (!Serial) {}
   Serial.println("Serial connected!");
 
-  /*
+  /*////////
    * Config the linear servo comms
-   */
+   *////////
 
   /*////////
    * Config the load cell amp
@@ -69,9 +69,9 @@ void setup() {
 
   Serial.println("Calibrated internal offset");
 
-  /*
+  /*////////
    * Configure the encoder
-   */
+   *////////
   encoder1.setInitConfig();   // load default settings
   encoder1.init();            // initialize hardware encoder
 
@@ -85,25 +85,25 @@ void setup() {
   digitalWrite(12, LOW);
 
 
-  /*
+  /*////////
    * Start the control and DAQ timers
-   */
+   *////////
   encoderTimer.begin(readEncoder, 3125);  // 320 Hz timer
   loadcellTimer.begin(readLoadCell, 3125);  // Read load cell at 320 Hz
 
 }
 
 
-/*
+/*////////
  * Main Loop
- */
+ *////////
 void loop() {
   // put your main code here, to run repeatedly:
 }
 
-/*
+/*////////
  * Function declarations
- */
+ *////////
 
 void readEncoder(){
   Serial.print("Encoder: ");
